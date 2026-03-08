@@ -5,12 +5,9 @@ from typing import Any
 
 import numpy as np
 
+from models.features import sigmoid
 from models.likelihoods import LikelihoodModel
 from qb_data.mc_builder import MCQuestion
-
-
-def _sigmoid(x: float) -> float:
-    return float(1.0 / (1.0 + np.exp(-x)))
 
 
 @dataclass
@@ -49,7 +46,7 @@ class ThresholdBuzzer:
         return probs.astype(np.float32)
 
     def _confidence_proxy(self, top_p: float) -> float:
-        return _sigmoid(self.alpha * (top_p - self.threshold))
+        return sigmoid(self.alpha * (top_p - self.threshold))
 
     def run_episode(self, question: MCQuestion) -> EpisodeResult:
         c_trace: list[float] = []

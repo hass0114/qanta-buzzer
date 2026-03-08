@@ -21,6 +21,15 @@ from __future__ import annotations
 import numpy as np
 
 
+def sigmoid(x: float) -> float:
+    """Compute a numerically stable sigmoid for scalar inputs."""
+    if x >= 0.0:
+        z = np.exp(-x)
+        return float(1.0 / (1.0 + z))
+    z = np.exp(x)
+    return float(z / (1.0 + z))
+
+
 def entropy_of_distribution(prob: np.ndarray) -> float:
     """Compute Shannon entropy of a probability distribution.
 

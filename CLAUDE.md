@@ -40,11 +40,13 @@ pip install -r requirements.txt
 Belief-feature smoke workflow:
 
 ```bash
-python scripts/build_mc_dataset.py --smoke
+python scripts/build_mc_dataset.py --config configs/smoke.yaml --smoke --output-dir artifacts/smoke
 python scripts/run_baselines.py --smoke
 python scripts/train_ppo.py --smoke
 python scripts/evaluate_all.py --smoke
 ```
+
+`build_mc_dataset.py` still defaults to `configs/default.yaml`, so the explicit smoke config and output dir are required for the intended smoke-sized build.
 
 T5 policy workflow:
 

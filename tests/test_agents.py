@@ -11,6 +11,8 @@ Covers:
 
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 import pytest
 
@@ -147,6 +149,19 @@ class TestThresholdBuzzer:
             assert 0.0 <= c_t <= 1.0, (
                 f"Confidence proxy {c_t} outside [0, 1]"
             )
+
+    def test_threshold_buzzer_confidence_proxy_stable_for_extreme_inputs(
+        self, sample_corpus: list[str]
+    ) -> None:
+        """Confidence proxy stays finite for large-magnitude logits."""
+        likelihood = _make_likelihood(sample_corpus)
+        agent = ThresholdBuzzer(likelihood_model=likelihood, threshold=1.0, alpha=1000.0)
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
+            c_t = agent._confidence_proxy(0.0)
+
+        assert c_t == 0.0
 
     def test_threshold_buzzer_custom_params(
         self, sample_mc_question: MCQuestion, sample_corpus: list[str]
@@ -329,6 +344,19 @@ class TestSoftmaxProfileBuzzer:
 
         for c_t in result.c_trace:
             assert 0.0 <= c_t <= 1.0, f"c_t {c_t} outside [0, 1]"
+
+    def test_softmax_profile_confidence_proxy_stable_for_extreme_inputs(
+        self, sample_corpus: list[str]
+    ) -> None:
+        """Confidence proxy stays finite for large-magnitude logits."""
+        likelihood = _make_likelihood(sample_corpus)
+        agent = SoftmaxProfileBuzzer(likelihood_model=likelihood, threshold=1.0, alpha=1000.0)
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
+            c_t = agent.confidence_proxy(0.0)
+
+        assert c_t == 0.0
 
     def test_softmax_profile_threshold_behavior(
         self, sample_mc_question: MCQuestion, sample_corpus: list[str]

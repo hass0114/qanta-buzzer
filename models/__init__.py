@@ -5,7 +5,7 @@ Likelihood models, belief feature extraction, and policy model interfaces
 for the quiz bowl RL buzzer system.
 """
 
-from models.features import extract_belief_features, entropy_of_distribution
+from models.features import extract_belief_features, entropy_of_distribution, sigmoid
 from models.likelihoods import (
     LikelihoodModel,
     OpenAILikelihood,
@@ -29,6 +29,7 @@ def __getattr__(name: str):
 __all__ = [
     "extract_belief_features",
     "entropy_of_distribution",
+    "sigmoid",
     "LikelihoodModel",
     "TfIdfLikelihood",
     "SBERTLikelihood",
