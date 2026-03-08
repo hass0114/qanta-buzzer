@@ -1,5 +1,164 @@
 [
   {
+    "qid": "3873",
+    "buzz_step": 0,
+    "buzz_index": 2,
+    "gold_index": 2,
+    "correct": true,
+    "episode_reward": 1.0,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.3438616096973419
+    ],
+    "entropy_trace": [
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "190849",
+    "buzz_step": 0,
+    "buzz_index": 3,
+    "gold_index": 0,
+    "correct": false,
+    "episode_reward": -0.5,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.336672306060791
+    ],
+    "entropy_trace": [
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "203022",
+    "buzz_step": 1,
+    "buzz_index": 2,
+    "gold_index": 1,
+    "correct": false,
+    "episode_reward": -0.7,
+    "c_trace": [
+      0.9251592755317688,
+      0.923983633518219,
+      0.9250166416168213
+    ],
+    "g_trace": [
+      0.21518273651599884,
+      0.21628645062446594,
+      0.21564912796020508
+    ],
+    "entropy_trace": [
+      1.4686174392700195,
+      1.4716410636901855,
+      1.4689712524414062
+    ]
+  },
+  {
+    "qid": "103377",
+    "buzz_step": 0,
+    "buzz_index": 2,
+    "gold_index": 0,
+    "correct": false,
+    "episode_reward": -0.5,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.336672306060791
+    ],
+    "entropy_trace": [
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "13075",
+    "buzz_step": 0,
+    "buzz_index": 1,
+    "gold_index": 2,
+    "correct": false,
+    "episode_reward": -0.5,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.3438616096973419
+    ],
+    "entropy_trace": [
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "10341",
+    "buzz_step": 0,
+    "buzz_index": 1,
+    "gold_index": 3,
+    "correct": false,
+    "episode_reward": -0.5,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.10428336262702942
+    ],
+    "entropy_trace": [
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "209120",
+    "buzz_step": 0,
+    "buzz_index": 2,
+    "gold_index": 0,
+    "correct": false,
+    "episode_reward": -0.5,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.336672306060791
+    ],
+    "entropy_trace": [
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "202429",
+    "buzz_step": 0,
+    "buzz_index": 2,
+    "gold_index": 1,
+    "correct": false,
+    "episode_reward": -0.5,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.21518273651599884
+    ],
+    "entropy_trace": [
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "101328",
+    "buzz_step": 0,
+    "buzz_index": 0,
+    "gold_index": 0,
+    "correct": true,
+    "episode_reward": 1.0,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.336672306060791
+    ],
+    "entropy_trace": [
+      1.4686174392700195
+    ]
+  },
+  {
     "qid": "194229",
     "buzz_step": 0,
     "buzz_index": 0,
@@ -7,30 +166,30 @@
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.15063035488128662
+      0.21518273651599884
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "190849",
     "buzz_step": 0,
-    "buzz_index": 1,
+    "buzz_index": 2,
     "gold_index": 0,
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.41816025972366333
+      0.336672306060791
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
@@ -39,52 +198,52 @@
     "buzz_index": 0,
     "gold_index": 2,
     "correct": false,
-    "episode_reward": -0.6,
+    "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241,
-      0.9249126315116882
+      0.9251592755317688
     ],
     "g_trace": [
-      0.30029866099357605,
-      0.3003089427947998
+      0.3438616096973419
     ],
     "entropy_trace": [
-      1.4499484300613403,
-      1.444108009338379
+      1.4686174392700195
     ]
   },
   {
     "qid": "3873",
     "buzz_step": 0,
-    "buzz_index": 3,
+    "buzz_index": 0,
     "gold_index": 2,
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.30029866099357605
+      0.3438616096973419
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "360",
     "buzz_step": 0,
-    "buzz_index": 0,
+    "buzz_index": 1,
     "gold_index": 0,
-    "correct": true,
-    "episode_reward": 1.0,
+    "correct": false,
+    "episode_reward": -0.6,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688,
+      0.9261242151260376
     ],
     "g_trace": [
-      0.41816025972366333
+      0.336672306060791,
+      0.33800169825553894
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195,
+      1.4659425020217896
     ]
   },
   {
@@ -95,13 +254,13 @@
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.41816025972366333
+      0.336672306060791
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
@@ -110,205 +269,205 @@
     "buzz_index": 2,
     "gold_index": 3,
     "correct": false,
-    "episode_reward": -0.5,
+    "episode_reward": -0.6,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688,
+      0.9258149266242981
     ],
     "g_trace": [
-      0.130910724401474
+      0.10428336262702942,
+      0.1033523827791214
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195,
+      1.4667634963989258
     ]
   },
   {
     "qid": "12430",
     "buzz_step": 0,
-    "buzz_index": 1,
+    "buzz_index": 0,
     "gold_index": 2,
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.30029866099357605
+      0.3438616096973419
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "360",
     "buzz_step": 0,
-    "buzz_index": 0,
+    "buzz_index": 2,
     "gold_index": 0,
-    "correct": true,
-    "episode_reward": 1.0,
+    "correct": false,
+    "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.41816025972366333
+      0.336672306060791
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "107378",
     "buzz_step": 0,
-    "buzz_index": 0,
+    "buzz_index": 2,
     "gold_index": 2,
-    "correct": false,
-    "episode_reward": -0.5,
+    "correct": true,
+    "episode_reward": 1.0,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.30029866099357605
+      0.3438616096973419
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "103395",
     "buzz_step": 0,
-    "buzz_index": 0,
+    "buzz_index": 2,
     "gold_index": 0,
-    "correct": true,
-    "episode_reward": 0.9,
+    "correct": false,
+    "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241,
-      0.9257937669754028
+      0.9251592755317688
     ],
     "g_trace": [
-      0.41816025972366333,
-      0.4235743582248688
+      0.336672306060791
     ],
     "entropy_trace": [
-      1.4499484300613403,
-      1.4411075115203857
+      1.4686174392700195
     ]
   },
   {
     "qid": "203022",
     "buzz_step": 0,
-    "buzz_index": 0,
+    "buzz_index": 2,
     "gold_index": 1,
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.15063035488128662
+      0.21518273651599884
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "13075",
     "buzz_step": 0,
-    "buzz_index": 2,
+    "buzz_index": 1,
     "gold_index": 2,
-    "correct": true,
-    "episode_reward": 1.0,
+    "correct": false,
+    "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.30029866099357605
+      0.3438616096973419
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "3873",
     "buzz_step": 0,
-    "buzz_index": 0,
+    "buzz_index": 3,
     "gold_index": 2,
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.30029866099357605
+      0.3438616096973419
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "197503",
     "buzz_step": 0,
-    "buzz_index": 1,
+    "buzz_index": 0,
     "gold_index": 0,
-    "correct": false,
-    "episode_reward": -0.5,
+    "correct": true,
+    "episode_reward": 1.0,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.41816025972366333
+      0.336672306060791
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "107378",
+    "buzz_step": 0,
+    "buzz_index": 1,
+    "gold_index": 2,
+    "correct": false,
+    "episode_reward": -0.5,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.3438616096973419
+    ],
+    "entropy_trace": [
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "871",
     "buzz_step": 0,
     "buzz_index": 2,
     "gold_index": 2,
     "correct": true,
     "episode_reward": 1.0,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.30029866099357605
+      0.3438616096973419
     ],
     "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "871",
-    "buzz_step": 0,
-    "buzz_index": 1,
-    "gold_index": 2,
-    "correct": false,
-    "episode_reward": -0.5,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.30029866099357605
-    ],
-    "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "197503",
     "buzz_step": 0,
-    "buzz_index": 3,
+    "buzz_index": 1,
     "gold_index": 0,
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.41816025972366333
+      0.336672306060791
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
@@ -319,115 +478,115 @@
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.41816025972366333
+      0.336672306060791
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "13286",
     "buzz_step": 0,
-    "buzz_index": 0,
+    "buzz_index": 2,
     "gold_index": 0,
-    "correct": true,
-    "episode_reward": 1.0,
+    "correct": false,
+    "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.41816025972366333
+      0.336672306060791
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "192507",
     "buzz_step": 0,
-    "buzz_index": 0,
-    "gold_index": 2,
-    "correct": false,
-    "episode_reward": -0.5,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.30029866099357605
-    ],
-    "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "106934",
-    "buzz_step": 0,
-    "buzz_index": 1,
-    "gold_index": 3,
-    "correct": false,
-    "episode_reward": -0.5,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.130910724401474
-    ],
-    "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "211302",
-    "buzz_step": 0,
     "buzz_index": 2,
     "gold_index": 2,
     "correct": true,
     "episode_reward": 1.0,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.30029866099357605
+      0.3438616096973419
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "106934",
+    "buzz_step": 0,
+    "buzz_index": 2,
+    "gold_index": 3,
+    "correct": false,
+    "episode_reward": -0.5,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.10428336262702942
+    ],
+    "entropy_trace": [
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "211302",
+    "buzz_step": 0,
+    "buzz_index": 0,
+    "gold_index": 2,
+    "correct": false,
+    "episode_reward": -0.5,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.3438616096973419
+    ],
+    "entropy_trace": [
+      1.4686174392700195
     ]
   },
   {
     "qid": "209120",
     "buzz_step": 0,
-    "buzz_index": 2,
+    "buzz_index": 0,
     "gold_index": 0,
-    "correct": false,
-    "episode_reward": -0.5,
+    "correct": true,
+    "episode_reward": 1.0,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.41816025972366333
+      0.336672306060791
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "203022",
     "buzz_step": 0,
-    "buzz_index": 2,
+    "buzz_index": 0,
     "gold_index": 1,
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.15063035488128662
+      0.21518273651599884
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
@@ -438,81 +597,81 @@
     "correct": true,
     "episode_reward": 1.0,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.30029866099357605
+      0.3438616096973419
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "9319",
     "buzz_step": 0,
-    "buzz_index": 0,
+    "buzz_index": 1,
     "gold_index": 3,
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.130910724401474
+      0.10428336262702942
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
     "qid": "212078",
-    "buzz_step": 0,
-    "buzz_index": 1,
-    "gold_index": 2,
-    "correct": false,
-    "episode_reward": -0.5,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.30029866099357605
-    ],
-    "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "194229",
-    "buzz_step": 0,
-    "buzz_index": 0,
-    "gold_index": 1,
-    "correct": false,
-    "episode_reward": -0.5,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.15063035488128662
-    ],
-    "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "107378",
     "buzz_step": 0,
     "buzz_index": 2,
     "gold_index": 2,
     "correct": true,
     "episode_reward": 1.0,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.30029866099357605
+      0.3438616096973419
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "194229",
+    "buzz_step": 0,
+    "buzz_index": 2,
+    "gold_index": 1,
+    "correct": false,
+    "episode_reward": -0.5,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.21518273651599884
+    ],
+    "entropy_trace": [
+      1.4686174392700195
+    ]
+  },
+  {
+    "qid": "107378",
+    "buzz_step": 0,
+    "buzz_index": 1,
+    "gold_index": 2,
+    "correct": false,
+    "episode_reward": -0.5,
+    "c_trace": [
+      0.9251592755317688
+    ],
+    "g_trace": [
+      0.3438616096973419
+    ],
+    "entropy_trace": [
+      1.4686174392700195
     ]
   },
   {
@@ -521,75 +680,66 @@
     "buzz_index": 1,
     "gold_index": 2,
     "correct": false,
-    "episode_reward": -0.6,
+    "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241,
-      0.9254628419876099
+      0.9251592755317688
     ],
     "g_trace": [
-      0.30029866099357605,
-      0.30050578713417053
+      0.3438616096973419
     ],
     "entropy_trace": [
-      1.4499484300613403,
-      1.4423072338104248
+      1.4686174392700195
     ]
   },
   {
     "qid": "13286",
     "buzz_step": 0,
-    "buzz_index": 0,
+    "buzz_index": 2,
     "gold_index": 0,
-    "correct": true,
-    "episode_reward": 0.9,
+    "correct": false,
+    "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241,
-      0.9249126315116882
+      0.9251592755317688
     ],
     "g_trace": [
-      0.41816025972366333,
-      0.4218365252017975
+      0.336672306060791
     ],
     "entropy_trace": [
-      1.4499484300613403,
-      1.444108009338379
+      1.4686174392700195
     ]
   },
   {
     "qid": "194229",
     "buzz_step": 0,
-    "buzz_index": 0,
+    "buzz_index": 1,
     "gold_index": 1,
-    "correct": false,
-    "episode_reward": -0.6,
+    "correct": true,
+    "episode_reward": 1.0,
     "c_trace": [
-      0.9231981039047241,
-      0.9257814884185791
+      0.9251592755317688
     ],
     "g_trace": [
-      0.15063035488128662,
-      0.14770551025867462
+      0.21518273651599884
     ],
     "entropy_trace": [
-      1.4499484300613403,
-      1.4411240816116333
+      1.4686174392700195
     ]
   },
   {
     "qid": "10341",
     "buzz_step": 0,
-    "buzz_index": 0,
+    "buzz_index": 2,
     "gold_index": 3,
     "correct": false,
     "episode_reward": -0.5,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.130910724401474
+      0.10428336262702942
     ],
     "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   },
   {
@@ -600,169 +750,13 @@
     "correct": true,
     "episode_reward": 1.0,
     "c_trace": [
-      0.9231981039047241
+      0.9251592755317688
     ],
     "g_trace": [
-      0.41816025972366333
+      0.336672306060791
     ],
     "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "10341",
-    "buzz_step": 0,
-    "buzz_index": 1,
-    "gold_index": 3,
-    "correct": false,
-    "episode_reward": -0.5,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.130910724401474
-    ],
-    "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "191316",
-    "buzz_step": 0,
-    "buzz_index": 0,
-    "gold_index": 1,
-    "correct": false,
-    "episode_reward": -0.6,
-    "c_trace": [
-      0.9231981039047241,
-      0.9252119660377502
-    ],
-    "g_trace": [
-      0.15063035488128662,
-      0.14840902388095856
-    ],
-    "entropy_trace": [
-      1.4499484300613403,
-      1.4431052207946777
-    ]
-  },
-  {
-    "qid": "209120",
-    "buzz_step": 0,
-    "buzz_index": 1,
-    "gold_index": 0,
-    "correct": false,
-    "episode_reward": -0.5,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.41816025972366333
-    ],
-    "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "3873",
-    "buzz_step": 0,
-    "buzz_index": 1,
-    "gold_index": 2,
-    "correct": false,
-    "episode_reward": -0.5,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.30029866099357605
-    ],
-    "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "202722",
-    "buzz_step": 0,
-    "buzz_index": 2,
-    "gold_index": 2,
-    "correct": true,
-    "episode_reward": 1.0,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.30029866099357605
-    ],
-    "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "211350",
-    "buzz_step": 0,
-    "buzz_index": 2,
-    "gold_index": 3,
-    "correct": false,
-    "episode_reward": -0.5,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.130910724401474
-    ],
-    "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "10341",
-    "buzz_step": 0,
-    "buzz_index": 0,
-    "gold_index": 3,
-    "correct": false,
-    "episode_reward": -0.5,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.130910724401474
-    ],
-    "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "212078",
-    "buzz_step": 0,
-    "buzz_index": 2,
-    "gold_index": 2,
-    "correct": true,
-    "episode_reward": 1.0,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.30029866099357605
-    ],
-    "entropy_trace": [
-      1.4499484300613403
-    ]
-  },
-  {
-    "qid": "190225",
-    "buzz_step": 0,
-    "buzz_index": 0,
-    "gold_index": 2,
-    "correct": false,
-    "episode_reward": -0.5,
-    "c_trace": [
-      0.9231981039047241
-    ],
-    "g_trace": [
-      0.30029866099357605
-    ],
-    "entropy_trace": [
-      1.4499484300613403
+      1.4686174392700195
     ]
   }
 ]

@@ -44,6 +44,8 @@ python scripts/train_ppo.py --smoke
 python scripts/evaluate_all.py --smoke
 ```
 
+In smoke mode, `build_mc_dataset.py` now resolves its default config and output path dynamically: bare `--smoke` selects the smoke config path and writes datasets to `artifacts/smoke/` unless you explicitly override `--config` or `--output-dir`.
+
 T5 policy track:
 
 ```bash

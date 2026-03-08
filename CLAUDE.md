@@ -46,6 +46,8 @@ python scripts/train_ppo.py --smoke
 python scripts/evaluate_all.py --smoke
 ```
 
+Bare `python scripts/build_mc_dataset.py --smoke` is now a valid contract: it selects the smoke config path and writes datasets to `artifacts/smoke/` unless `--config` or `--output-dir` are supplied explicitly.
+
 T5 policy workflow:
 
 ```bash

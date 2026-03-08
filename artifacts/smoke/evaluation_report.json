@@ -4,7 +4,7 @@
     "n": 44.0,
     "buzz_accuracy": 0.38636363636363635,
     "mean_buzz_step": 3.5,
-    "mean_sq": 0.24329479467724396,
+    "mean_sq": 0.24329479467724402,
     "mean_reward_like": 0.0,
     "ece": 0.0,
     "brier": 0.0,
@@ -30,7 +30,7 @@
       "n": 44.0,
       "buzz_accuracy": 0.38636363636363635,
       "mean_buzz_step": 3.5,
-      "mean_sq": 0.24329479467724396,
+      "mean_sq": 0.24329479467724402,
       "mean_reward_like": 0.0,
       "ece": 0.0,
       "brier": 0.0,
@@ -77,7 +77,7 @@
       "n": 1.0,
       "buzz_accuracy": 1.0,
       "mean_buzz_step": 2.0,
-      "mean_sq": 0.8705244202243024,
+      "mean_sq": 0.8705244202243025,
       "mean_reward_like": 0.0
     },
     "Science": {
@@ -105,7 +105,7 @@
       "n": 9.0,
       "buzz_accuracy": 0.2222222222222222,
       "mean_buzz_step": 4.111111111111111,
-      "mean_sq": 0.13942178083467244,
+      "mean_sq": 0.13942178083467247,
       "mean_reward_like": 0.0
     },
     "Social_Science:Religion": {
@@ -122,7 +122,7 @@
         "n": 44.0,
         "buzz_accuracy": 0.38636363636363635,
         "mean_buzz_step": 3.5,
-        "mean_sq": 0.24329479467724396,
+        "mean_sq": 0.24329479467724402,
         "mean_reward_like": 0.07954545454545454,
         "ece": 0.0,
         "brier": 0.0,
@@ -154,7 +154,7 @@
         "n": 44.0,
         "buzz_accuracy": 0.38636363636363635,
         "mean_buzz_step": 3.5,
-        "mean_sq": 0.24329479467724396,
+        "mean_sq": 0.24329479467724402,
         "mean_reward_like": 0.0,
         "ece": 0.0,
         "brier": 0.0,
@@ -186,7 +186,7 @@
         "n": 44.0,
         "buzz_accuracy": 0.38636363636363635,
         "mean_buzz_step": 3.0454545454545454,
-        "mean_sq": 0.26743703225887505,
+        "mean_sq": 0.2674370322588751,
         "mean_reward_like": 0.0,
         "ece": 0.0,
         "brier": 0.0,
@@ -226,12 +226,12 @@
   },
   "ppo_summary": {
     "n": 44.0,
-    "buzz_accuracy": 0.29545454545454547,
-    "mean_buzz_step": 0.0,
-    "mean_sq": 0.26847732185221707,
-    "mean_reward_like": -0.07045454545454545,
-    "ece": 0.09042495285922833,
-    "brier": 0.18023584448815694,
+    "buzz_accuracy": 0.25,
+    "mean_buzz_step": 0.022727272727272728,
+    "mean_sq": 0.27264222811278266,
+    "mean_reward_like": -0.1340909090909091,
+    "ece": 0.04357596215876666,
+    "brier": 0.17805268460634988,
     "n_calibration": 44.0
   }
 }

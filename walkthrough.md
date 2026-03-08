@@ -22,6 +22,7 @@ rg --files . -g '!venv/**' -g '!**/__pycache__/**' -g '!artifacts/smoke/**' | so
 ./PROJECT_OVERVIEW.md
 ./README.md
 ./agents/__init__.py
+./agents/_math.py
 ./agents/bayesian_buzzer.py
 ./agents/ppo_buzzer.py
 ./agents/softmax_profile_buzzer.py
@@ -84,6 +85,7 @@ rg --files . -g '!venv/**' -g '!**/__pycache__/**' -g '!artifacts/smoke/**' | so
 ./tests/__init__.py
 ./tests/conftest.py
 ./tests/test_agents.py
+./tests/test_build_mc_dataset.py
 ./tests/test_environment.py
 ./tests/test_factories.py
 ./tests/test_features.py
@@ -156,6 +158,8 @@ python scripts/run_baselines.py --smoke
 python scripts/train_ppo.py --smoke
 python scripts/evaluate_all.py --smoke
 ```
+
+In smoke mode, `build_mc_dataset.py` now resolves its default config and output path dynamically: bare `--smoke` selects the smoke config path and writes datasets to `artifacts/smoke/` unless you explicitly override `--config` or `--output-dir`.
 
 T5 policy track:
 
@@ -264,6 +268,8 @@ python scripts/train_ppo.py --smoke
 python scripts/evaluate_all.py --smoke
 ```
 
+Bare `python scripts/build_mc_dataset.py --smoke` is now a valid contract: it selects the smoke config path and writes datasets to `artifacts/smoke/` unless `--config` or `--output-dir` are supplied explicitly.
+
 T5 policy workflow:
 
 ```bash
@@ -334,7 +340,7 @@ This script orchestrates the complete data pipeline:
 
 Usage:
     python scripts/build_mc_dataset.py
-    python scripts/build_mc_dataset.py --smoke  # Quick test with 50 questions
+    python scripts/build_mc_dataset.py --smoke  # Quick test with 50 questions in artifacts/smoke
     python scripts/build_mc_dataset.py --config configs/custom.yaml
     python scripts/build_mc_dataset.py --data.K=5 --data.distractor_strategy=tfidf_profile
 """
@@ -357,6 +363,9 @@ from qb_data.dataset_splits import create_stratified_splits
 from qb_data.huggingface_loader import load_from_huggingface
 from qb_data.mc_builder import MCBuilder, MCQuestion
 
+DEFAULT_OUTPUT_DIR = Path("data/processed")
+SMOKE_OUTPUT_DIR = Path("artifacts/smoke")
+
 
 def parse_overrides(args: argparse.Namespace) -> Dict[str, Any]:
     """
@@ -378,9 +387,6 @@ def parse_overrides(args: argparse.Namespace) -> Dict[str, Any]:
 
     # Check for any attributes that look like overrides (contain dots)
     for key, value in vars(args).items():
-        if value is not None and '.' not in key:
-            continue  # Skip non-override args
-
 ```
 
 ```bash
@@ -393,21 +399,21 @@ rg -n "resolve_data_loading_options|AnswerProfileBuilder|MCBuilder|create_strati
 31:from qb_data.config import load_config, merge_overrides, resolve_data_loading_options
 33:from qb_data.dataset_splits import create_stratified_splits
 35:from qb_data.mc_builder import MCBuilder, MCQuestion
-97:def save_json(path: Path, data: List[Any]) -> None:
-124:def print_statistics(
-128:    profile_builder: Optional[AnswerProfileBuilder] = None,
-129:    mc_builder: Optional[MCBuilder] = None
-142:    profile_builder : Optional[AnswerProfileBuilder]
-144:    mc_builder : Optional[MCBuilder]
-249:    data_opts = resolve_data_loading_options(config, smoke=args.smoke)
-281:    profile_builder = AnswerProfileBuilder(
-290:    mc_builder = MCBuilder(
-318:    train, val, test = create_stratified_splits(mc_questions, ratios=ratios)
-322:    save_json(output_dir / "mc_dataset.json", mc_questions)
-323:    save_json(output_dir / "train_dataset.json", train)
-324:    save_json(output_dir / "val_dataset.json", val)
-325:    save_json(output_dir / "test_dataset.json", test)
-341:    print_statistics(train, val, test, profile_builder, mc_builder)
+144:def save_json(path: Path, data: List[Any]) -> None:
+171:def print_statistics(
+175:    profile_builder: Optional[AnswerProfileBuilder] = None,
+176:    mc_builder: Optional[MCBuilder] = None
+189:    profile_builder : Optional[AnswerProfileBuilder]
+191:    mc_builder : Optional[MCBuilder]
+267:    data_opts = resolve_data_loading_options(config, smoke=args.smoke)
+299:    profile_builder = AnswerProfileBuilder(
+308:    mc_builder = MCBuilder(
+336:    train, val, test = create_stratified_splits(mc_questions, ratios=ratios)
+340:    save_json(output_dir / "mc_dataset.json", mc_questions)
+341:    save_json(output_dir / "train_dataset.json", train)
+342:    save_json(output_dir / "val_dataset.json", val)
+343:    save_json(output_dir / "test_dataset.json", test)
+359:    print_statistics(train, val, test, profile_builder, mc_builder)
 ```
 
 ```bash
@@ -3885,12 +3891,9 @@ from typing import Any
 
 import numpy as np
 
+from agents._math import sigmoid
 from models.likelihoods import LikelihoodModel
 from qb_data.mc_builder import MCQuestion
-
-
-def _sigmoid(x: float) -> float:
-    return float(1.0 / (1.0 + np.exp(-x)))
 
 
 @dataclass
@@ -3929,7 +3932,7 @@ class ThresholdBuzzer:
         return probs.astype(np.float32)
 
     def _confidence_proxy(self, top_p: float) -> float:
-        return _sigmoid(self.alpha * (top_p - self.threshold))
+        return sigmoid(self.alpha * (top_p - self.threshold))
 
     def run_episode(self, question: MCQuestion) -> EpisodeResult:
         c_trace: list[float] = []
@@ -4067,12 +4070,9 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from agents._math import sigmoid
 from models.likelihoods import LikelihoodModel
 from qb_data.mc_builder import MCQuestion
-
-
-def _sigmoid(x: float) -> float:
-    return float(1.0 / (1.0 + np.exp(-x)))
 
 
 @dataclass
@@ -4110,7 +4110,7 @@ class SoftmaxProfileBuzzer:
         return probs.astype(np.float32)
 
     def confidence_proxy(self, top_p: float) -> float:
-        return _sigmoid(self.alpha * (top_p - self.threshold))
+        return sigmoid(self.alpha * (top_p - self.threshold))
 
     def run_episode(self, question: MCQuestion) -> SoftmaxEpisodeResult:
         c_trace: list[float] = []
@@ -4195,7 +4195,7 @@ class SequentialBayesBuzzer:
             top_idx = int(np.argmax(belief))
             top_p = float(np.max(belief))
             entropy = float(-(np.clip(belief, 1e-12, 1.0) * np.log(np.clip(belief, 1e-12, 1.0))).sum())
-            c_t = _sigmoid(self.alpha * (top_p - self.threshold))
+            c_t = sigmoid(self.alpha * (top_p - self.threshold))
             g_t = 1.0 if top_idx == question.gold_index else 0.0
 
             c_trace.append(c_t)
@@ -4529,9 +4529,9 @@ PY
 
 ```output
 baseline_groups = ['always_final', 'sequential_bayes', 'softmax_profile', 'threshold']
-threshold sample_threshold= 0.5 metrics= {'n': 44.0, 'buzz_accuracy': 0.38636363636363635, 'mean_buzz_step': 3.5, 'mean_sq': 0.24329479467724396, 'mean_reward_like': 0.07954545454545454, 'ece': 0.0, 'brier': 0.0, 'n_calibration': 44.0}
-softmax_profile sample_threshold= 0.5 metrics= {'n': 44.0, 'buzz_accuracy': 0.38636363636363635, 'mean_buzz_step': 3.5, 'mean_sq': 0.24329479467724396, 'mean_reward_like': 0.0, 'ece': 0.0, 'brier': 0.0, 'n_calibration': 44.0}
-sequential_bayes sample_threshold= 0.5 metrics= {'n': 44.0, 'buzz_accuracy': 0.38636363636363635, 'mean_buzz_step': 3.0454545454545454, 'mean_sq': 0.26743703225887505, 'mean_reward_like': 0.0, 'ece': 0.0, 'brier': 0.0, 'n_calibration': 44.0}
+threshold sample_threshold= 0.5 metrics= {'n': 44.0, 'buzz_accuracy': 0.38636363636363635, 'mean_buzz_step': 3.5, 'mean_sq': 0.24329479467724402, 'mean_reward_like': 0.07954545454545454, 'ece': 0.0, 'brier': 0.0, 'n_calibration': 44.0}
+softmax_profile sample_threshold= 0.5 metrics= {'n': 44.0, 'buzz_accuracy': 0.38636363636363635, 'mean_buzz_step': 3.5, 'mean_sq': 0.24329479467724402, 'mean_reward_like': 0.0, 'ece': 0.0, 'brier': 0.0, 'n_calibration': 44.0}
+sequential_bayes sample_threshold= 0.5 metrics= {'n': 44.0, 'buzz_accuracy': 0.38636363636363635, 'mean_buzz_step': 3.0454545454545454, 'mean_sq': 0.2674370322588751, 'mean_reward_like': 0.0, 'ece': 0.0, 'brier': 0.0, 'n_calibration': 44.0}
 always_final accuracy= 0.38636363636363635 mean_sq= 0.38636363636363635
 ```
 
@@ -5174,15 +5174,15 @@ PY
 ```output
 full_eval_keys = ['brier', 'buzz_accuracy', 'ece', 'mean_buzz_step', 'mean_reward_like', 'mean_sq', 'n', 'n_calibration']
 controls = ['alias_substitution', 'choices_only', 'shuffle']
-full_eval_mean_sq = 0.24329479467724396
+full_eval_mean_sq = 0.24329479467724402
 choices_only = {'accuracy': 0.09090909090909091, 'chance': 0.25, 'n_test': 11.0}
 per_category_count = 11
 comparison_csv_head =
 ['agent', 'n', 'buzz_accuracy', 'mean_buzz_step', 'mean_sq', 'mean_reward_like', 'ece', 'brier', 'n_calibration']
-['threshold_0.5', '44.0', '0.38636363636363635', '3.5', '0.24329479467724396', '0.07954545454545454', '0.0', '0.0', '44.0']
+['threshold_0.5', '44.0', '0.38636363636363635', '3.5', '0.24329479467724402', '0.07954545454545454', '0.0', '0.0', '44.0']
 ['threshold_0.7', '44.0', '0.38636363636363635', '3.9545454545454546', '0.12951727467749788', '0.07954545454545454', '0.0', '0.0', '44.0']
 ['threshold_0.9', '44.0', '0.38636363636363635', '4.045454545454546', '0.05277608956128622', '0.07954545454545454', '0.0', '0.0', '44.0']
-['softmax_0.5', '44.0', '0.38636363636363635', '3.5', '0.24329479467724396', '0.0', '0.0', '0.0', '44.0']
+['softmax_0.5', '44.0', '0.38636363636363635', '3.5', '0.24329479467724402', '0.0', '0.0', '0.0', '44.0']
 ```
 
 ## 8. T5 training track
@@ -8145,6 +8145,7 @@ tests/__pycache__/conftest.cpython-312-pytest-9.0.2.pyc
 tests/__pycache__/conftest.cpython-312.pyc
 tests/__pycache__/test_agents.cpython-311-pytest-9.0.2.pyc
 tests/__pycache__/test_agents.cpython-312-pytest-9.0.2.pyc
+tests/__pycache__/test_build_mc_dataset.cpython-312-pytest-9.0.2.pyc
 tests/__pycache__/test_environment.cpython-311-pytest-9.0.2.pyc
 tests/__pycache__/test_environment.cpython-312-pytest-9.0.2.pyc
 tests/__pycache__/test_factories.cpython-311-pytest-9.0.2.pyc
@@ -8168,6 +8169,7 @@ tests/__pycache__/test_text_wrapper.cpython-311-pytest-9.0.2.pyc
 tests/__pycache__/test_text_wrapper.cpython-312-pytest-9.0.2.pyc
 tests/conftest.py
 tests/test_agents.py
+tests/test_build_mc_dataset.py
 tests/test_environment.py
 tests/test_factories.py
 tests/test_features.py
@@ -8198,8 +8200,9 @@ PY
 ```
 
 ```output
-test_files = 12
+test_files = 13
 test_agents.py test_functions= 0
+test_build_mc_dataset.py test_functions= 0
 test_environment.py test_functions= 0
 test_factories.py test_functions= 0
 test_features.py test_functions= 0
@@ -8517,18 +8520,18 @@ rg -n "qb_env.data_loader|qb_env.mc_builder|qb_env.text_utils|models.answer_prof
 
 ```output
 CLAUDE.md:12:`qanta-buzzer` is the canonical repo. qb-rl compatibility is preserved through additive shims rather than structural rewrites.
-CLAUDE.md:75:- `qb_env/`: Gymnasium environment plus text wrapper and qb-rl compatibility shims
-CLAUDE.md:76:- `models/`: likelihood models, belief features, T5 policy model, compatibility exports
-CLAUDE.md:85:- Old qb-rl imports like `qb_env.data_loader` and `models.answer_profiles` are thin re-exports over the canonical modules.
+CLAUDE.md:77:- `qb_env/`: Gymnasium environment plus text wrapper and qb-rl compatibility shims
+CLAUDE.md:78:- `models/`: likelihood models, belief features, T5 policy model, compatibility exports
+CLAUDE.md:87:- Old qb-rl imports like `qb_env.data_loader` and `models.answer_profiles` are thin re-exports over the canonical modules.
 CLAUDE.md:9:1. Belief-feature pipeline: build MC tossups, score answer profiles with TF-IDF / SBERT / T5 / optional OpenAI embeddings, train or compare buzzers, and evaluate with S_q plus calibration metrics.
 README.md:10:- Optional OpenAI embedding support for `likelihood.model: openai` and `data.distractor_strategy: openai_profile`
 README.md:5:This repo keeps `qanta-buzzer` as the canonical implementation while preserving a qb-rl compatibility bridge:
-README.md:69:- `qb_env.data_loader`
-README.md:70:- `qb_env.mc_builder`
-README.md:71:- `qb_env.text_utils`
-README.md:72:- `models.answer_profiles`
-README.md:73:- `agents.softmax_profile_buzzer`
-README.md:85:- qb-rl compatibility bridge and mocked OpenAI coverage
+README.md:71:- `qb_env.data_loader`
+README.md:72:- `qb_env.mc_builder`
+README.md:73:- `qb_env.text_utils`
+README.md:74:- `models.answer_profiles`
+README.md:75:- `agents.softmax_profile_buzzer`
+README.md:87:- qb-rl compatibility bridge and mocked OpenAI coverage
 agents/softmax_profile_buzzer.py:1:"""qb-rl compatibility re-exports for Bayesian-family buzzers."""
 models/answer_profiles.py:1:"""qb-rl compatibility re-export for answer profile building."""
 qb_env/__init__.py:14:from qb_env.mc_builder import MCBuilder, MCQuestion
@@ -8540,50 +8543,27 @@ qb_env/mc_builder.py:1:"""qb-rl compatibility re-exports for MC question buildin
 qb_env/text_utils.py:1:"""qb-rl compatibility re-exports for text utilities."""
 ```
 
-## 11. Closing mental model
-
-At this point the full repo can be summarized as one loop.
-
-1. Raw tossups are loaded and normalized.
-2. Answer profiles and guarded distractors turn them into multiple-choice tossups.
-3. A likelihood model scores each option as clues unfold.
-4. The environment converts those scores into belief state or text observations.
-5. Agents decide when to wait and when to buzz.
-6. Evaluation compares accuracy, timing, calibration, and artifact sensitivity.
-
-If you want to change the repo, the easiest starting points are:
-
-- change data construction in `qb_data/` if you care about answer-space quality or distractor artifacts
-- change `models/likelihoods.py` or `models/t5_policy.py` if you care about semantic representations
-- change `qb_env/` if you care about reward shaping or observation design
-- change `agents/` or `training/` if you care about decision policies
-- change `evaluation/` if you care about what counts as a good buzzer
-
-That division is the main payoff of the refactor: the canonical modular path makes each research question live in a smaller, easier-to-understand part of the codebase.
-
 ## 12. Smoke test runs in practice
 
-This appendix records a real end-to-end smoke pass I ran on March 6, 2026 from the repo root.
+This appendix records a fresh end-to-end smoke pass run on March 8, 2026 from the repo root after repairing the smoke CLI contract.
 
-There is one important gotcha before running it: `scripts/build_mc_dataset.py` defaults `--config` to `configs/default.yaml`, so bare `--smoke` is not enough to get the 50-question smoke build. In practice, use `--config configs/smoke.yaml --smoke --output-dir artifacts/smoke` for the build step so the later smoke scripts read the small dataset from `artifacts/smoke/mc_dataset.json`.
-
-The intended four-stage smoke workflow I ran was:
+Bare `python scripts/build_mc_dataset.py --smoke` is now the intended entrypoint again. When you do not override anything explicitly, the build step selects the smoke config path and writes its outputs to `artifacts/smoke/`, so the full smoke workflow is once again:
 
 ```bash
-venv/bin/python -u scripts/build_mc_dataset.py --config configs/smoke.yaml --smoke --output-dir artifacts/smoke
-venv/bin/python -u scripts/run_baselines.py --config configs/smoke.yaml --smoke
-venv/bin/python -u scripts/train_ppo.py --config configs/smoke.yaml --smoke
-venv/bin/python -u scripts/evaluate_all.py --config configs/smoke.yaml --smoke
+python scripts/build_mc_dataset.py --smoke
+python scripts/run_baselines.py --smoke
+python scripts/train_ppo.py --smoke
+python scripts/evaluate_all.py --smoke
 ```
 
-Observed wall-clock times on this machine:
+Observed wall-clock times on this machine during the recorded run were approximately:
 
-- dataset build: `real 2.07s`
-- baseline sweep: `real 2.77s`
-- PPO smoke training: `real 4.26s`
-- evaluation: `real 2.37s`
+- dataset build: `2.064s`
+- baseline sweep: `2.333s`
+- PPO smoke training: `5.282s`
+- evaluation: `2.035s`
 
-Those timings are for the intended smoke path. If you accidentally let the build step fall back to `configs/default.yaml`, the later smoke scripts can end up reading a much larger dataset and become dramatically slower.
+The rest of this appendix inspects the artifacts produced by that run instead of replaying the long commands inline, which keeps the Showboat document readable and verifiable while still grounding the walkthrough in a real smoke pass.
 
 ```bash
 sed -n '1,120p' configs/smoke.yaml; printf '\n'
@@ -8676,15 +8656,7 @@ supervised:
 
 ### Smoke build
 
-The corrected build command finishes quickly and leaves a small, inspectable dataset under `artifacts/smoke/`.
-
-Key console outcomes from the run:
-
-- loaded `20407` raw questions from `questions.csv`
-- applied the smoke cap and kept `50` questions
-- built `42` answer profiles
-- generated `44` MC questions after guard filtering
-- wrote `mc_dataset.json`, train/val/test splits, and `answer_profiles.json`
+The repaired build step loaded the local CSV, honored the 50-question smoke cap without extra flags, filtered a few questions through the MC guards, and wrote the expected dataset bundle to `artifacts/smoke/`.
 
 ```bash
 find artifacts/smoke -maxdepth 1 -type f | sort
@@ -8707,19 +8679,42 @@ artifacts/smoke/train_dataset.json
 artifacts/smoke/val_dataset.json
 ```
 
-Recorded from the run:
+```python3
+import json
+from pathlib import Path
+base = Path('artifacts/smoke')
+mc = json.loads((base / 'mc_dataset.json').read_text())
+train = json.loads((base / 'train_dataset.json').read_text())
+val = json.loads((base / 'val_dataset.json').read_text())
+test = json.loads((base / 'test_dataset.json').read_text())
+print({
+    'mc_questions': len(mc),
+    'train': len(train),
+    'val': len(val),
+    'test': len(test),
+})
+sample = mc[0]
+print({
+    'qid': sample['qid'],
+    'answer': sample['answer_primary'],
+    'category': sample['category'],
+    'options': sample['options'],
+})
 
-- `{"mc_questions": 44, "train": 28, "val": 3, "test": 13}`
-- `{"qid": "1704", "answer": "Seneca Falls Convention", "category": "History", "options": ["Seneca Falls Convention", "Charlemagne", "Inca Empire", "Netherlands"]}`
+```
+
+```output
+{'mc_questions': 44, 'train': 28, 'val': 3, 'test': 13}
+{'qid': '205242', 'answer': 'Mass spectrometry', 'category': 'Science:Chemistry', 'options': ['Charlemagne', 'Shiva', 'Mass spectrometry', 'Surface tension']}
+```
 
 ### Baseline sweep
 
-With the smoke dataset in place, the non-RL baseline stage is also cheap. It loaded `44` MC questions, built a TF-IDF likelihood model, and evaluated four baseline families over the reduced threshold sweep `[0.5, 0.7, 0.9]`.
+The baseline stage reused the smoke dataset, built a TF-IDF likelihood model, and evaluated the threshold, softmax-profile, sequential-Bayes, and always-buzz-final baselines over the reduced threshold sweep `[0.5, 0.7, 0.9]`.
 
-The notable result in this run is that all of the baseline families landed on the same smoke accuracy (`0.386`), but the stopping behavior differed. `AlwaysBuzzFinal` waited the longest and therefore had the best `mean_sq`, while `SequentialBayes` buzzed a bit earlier than the from-scratch softmax baselines at the same threshold.
+In this run all baseline families landed on the same smoke accuracy (`0.386`), but they differed in when they chose to buzz. `AlwaysBuzzFinal` waited the longest and therefore preserved the best `mean_sq`, while `SequentialBayes` buzzed a bit earlier than the from-scratch softmax baselines at the same threshold.
 
-```bash
-venv/bin/python - <<'PY'
+```python3
 import json
 from pathlib import Path
 summary = json.loads(Path('artifacts/smoke/baseline_summary.json').read_text())
@@ -8737,7 +8732,7 @@ for name, metrics in rows:
         'mean_sq': round(metrics['mean_sq'], 3),
         'mean_reward_like': round(metrics['mean_reward_like'], 3),
     })
-PY
+
 ```
 
 ```output
@@ -8753,25 +8748,32 @@ always_final
 
 ### PPO smoke training
 
-The PPO smoke run trains a tiny belief-state policy for only `1000` timesteps. The console trace shows the Stable Baselines3 rollout summaries updating quickly, and the stage leaves both `ppo_model.zip` and structured run summaries in `artifacts/smoke/`.
+The PPO smoke run trained the belief-state policy for only `1000` timesteps and left both the model checkpoint and structured summary artifacts under `artifacts/smoke/`.
 
-This particular smoke policy is clearly not meant to be a good buzzer. It learned a very early-buzzing behavior: `mean_buzz_step` ended up essentially at the first clue, which is why its reward-like metric is still negative even though `mean_sq` is not terrible.
+This is still a smoke test, not a quality target. The trained policy buzzed almost immediately on average, which kept `mean_sq` non-trivial but left the reward-like metric negative.
 
-Recorded summary from the run:
+```python3
+import json
+from pathlib import Path
+summary = json.loads(Path('artifacts/smoke/ppo_summary.json').read_text())
+print({key: round(value, 3) for key, value in summary.items()})
 
-- `{"n": 44.0, "buzz_accuracy": 0.25, "mean_buzz_step": 0.0, "mean_sq": 0.271, "mean_reward_like": -0.136, "ece": 0.056, "brier": 0.19, "n_calibration": 44.0}`
+```
+
+```output
+{'n': 44.0, 'buzz_accuracy': 0.25, 'mean_buzz_step': 0.023, 'mean_sq': 0.273, 'mean_reward_like': -0.134, 'ece': 0.044, 'brier': 0.178, 'n_calibration': 44.0}
+```
 
 ### Final evaluation
 
-The evaluation smoke run reads the just-written baseline and PPO artifacts, chooses the best softmax threshold (`0.5` in this run), computes the main report, then executes the three control experiments that are still enabled here: shuffle, alias substitution, and choices-only.
+The evaluation stage read the fresh baseline and PPO artifacts, selected the best softmax threshold from the baseline summary, and then computed the final report plus the three control experiments.
 
-Two details are worth noticing in the output:
+Two useful smoke-test details stand out here:
 
-- `alias_lookup.json` was absent in `artifacts/smoke/`, so the alias control fell back to an empty lookup.
-- the choices-only control dropped to `0.091` accuracy against `0.25` chance, which is the kind of sanity check you want the walkthrough reader to notice when validating that clues matter.
+- `alias_lookup.json` was still absent in `artifacts/smoke/`, so alias substitution fell back to an empty lookup.
+- the choices-only control dropped below chance, which is the kind of quick sanity check you want when validating that the model still needs clue content rather than just exploiting option artifacts.
 
-```bash
-venv/bin/python - <<'PY'
+```python3
 import json
 from pathlib import Path
 report = json.loads(Path('artifacts/smoke/evaluation_report.json').read_text())
@@ -8784,17 +8786,16 @@ print({
     'mean_reward_like': round(full['mean_reward_like'], 3),
 })
 print(report['controls'])
-PY
+
 ```
 
 ```output
 {'softmax_profile_best_threshold': 0.5}
 {'buzz_accuracy': 0.386, 'mean_buzz_step': 3.5, 'mean_sq': 0.243, 'mean_reward_like': 0.0}
-{'choices_only': {'accuracy': 0.09090909090909091, 'chance': 0.25, 'n_test': 11.0}, 'shuffle': {'n': 44.0, 'buzz_accuracy': 0.38636363636363635, 'mean_buzz_step': 3.5, 'mean_sq': 0.23666016887085728, 'mean_reward_like': 0.0, 'ece': 0.0, 'brier': 0.0, 'n_calibration': 44.0}, 'alias_substitution': {'n': 44.0, 'buzz_accuracy': 0.38636363636363635, 'mean_buzz_step': 3.5, 'mean_sq': 0.24329479467724396, 'mean_reward_like': 0.0, 'ece': 0.0, 'brier': 0.0, 'n_calibration': 44.0}}
+{'choices_only': {'accuracy': 0.09090909090909091, 'chance': 0.25, 'n_test': 11.0}, 'shuffle': {'n': 44.0, 'buzz_accuracy': 0.38636363636363635, 'mean_buzz_step': 3.5, 'mean_sq': 0.23666016887085728, 'mean_reward_like': 0.0, 'ece': 0.0, 'brier': 0.0, 'n_calibration': 44.0}, 'alias_substitution': {'n': 44.0, 'buzz_accuracy': 0.38636363636363635, 'mean_buzz_step': 3.5, 'mean_sq': 0.24329479467724402, 'mean_reward_like': 0.0, 'ece': 0.0, 'brier': 0.0, 'n_calibration': 44.0}}
 ```
 
-```bash
-venv/bin/python - <<'PY'
+```python3
 import json
 from pathlib import Path
 report = json.loads(Path('artifacts/smoke/evaluation_report.json').read_text())
@@ -8807,7 +8808,7 @@ for key in ['Science:Chemistry', 'Science:Physics', 'Fine_Arts', 'Literature', '
             'buzz_accuracy': round(metrics['buzz_accuracy'], 3),
             'mean_sq': round(metrics['mean_sq'], 3),
         })
-PY
+
 ```
 
 ```output
