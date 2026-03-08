@@ -8818,3 +8818,224 @@ Fine_Arts {'n': 7, 'buzz_accuracy': 0.143, 'mean_sq': 0.159}
 Literature {'n': 6, 'buzz_accuracy': 0.0, 'mean_sq': 0.0}
 Social_Science {'n': 9, 'buzz_accuracy': 0.222, 'mean_sq': 0.139}
 ```
+
+## 13. Full non-smoke workflow
+
+This section maps the full repo workflow without pretending that we re-ran the heavyweight path inline. The smoke appendix above is the executed proof path; this section is the code-grounded guide for the real full run.
+
+The canonical full belief-feature workflow from the repo root is:
+
+```bash
+python scripts/build_mc_dataset.py
+python scripts/run_baselines.py
+python scripts/train_ppo.py
+python scripts/evaluate_all.py
+```
+
+One subtlety matters here: in non-smoke mode the build step still defaults to `data/processed/`, while the later scripts look for `artifacts/main/mc_dataset.json` first and then fall back to `data/processed/mc_dataset.json`. So the default full workflow works as written, but if you want a single full-run artifact root you should use:
+
+```bash
+python scripts/build_mc_dataset.py --output-dir artifacts/main
+```
+
+The T5 training and comparison track is separate and heavier:
+
+```bash
+python scripts/train_t5_policy.py --config configs/t5_policy.yaml
+python scripts/compare_policies.py \
+  --mlp-checkpoint artifacts/main/ppo_model.zip \
+  --t5-checkpoint checkpoints/ppo_t5/best_model
+```
+
+That `compare_policies.py` invocation uses the actual SB3 checkpoint emitted by `train_ppo.py`, not the older `checkpoints/ppo/...` example still shown in the script docstring.
+
+### Full belief-feature run expectations
+
+The full belief-feature path is materially heavier than smoke mode because the default config does not cap the dataset, uses a semantic likelihood model by default, trains PPO for a real run length, and enables the full evaluation stack.
+
+The point of showing these values explicitly is to set expectations before someone pastes the command block and assumes it is another sub-10-second smoke run.
+
+```bash
+venv/bin/python - <<'PY'
+import yaml
+from pathlib import Path
+cfg = yaml.safe_load(Path('configs/default.yaml').read_text())
+print({
+    'data': {
+        'csv_path': cfg['data']['csv_path'],
+        'K': cfg['data']['K'],
+        'distractor_strategy': cfg['data']['distractor_strategy'],
+        'max_questions': cfg['data']['max_questions'],
+    },
+    'likelihood': {
+        'model': cfg['likelihood']['model'],
+        'beta': cfg['likelihood']['beta'],
+        'batch_size': cfg['likelihood']['batch_size'],
+        'max_length': cfg['likelihood']['max_length'],
+    },
+    'ppo': {
+        'total_timesteps': cfg['ppo']['total_timesteps'],
+        'n_steps': cfg['ppo']['n_steps'],
+        'batch_size': cfg['ppo']['batch_size'],
+        'n_epochs': cfg['ppo']['n_epochs'],
+    },
+    'evaluation': {
+        'compute_sq': cfg['evaluation']['compute_sq'],
+        'run_choices_only': cfg['evaluation']['run_choices_only'],
+        'run_shuffle': cfg['evaluation']['run_shuffle'],
+        'bootstrap_ci_samples': cfg['evaluation']['bootstrap_ci_samples'],
+    },
+})
+PY
+
+```
+
+```output
+{'data': {'csv_path': 'questions.csv', 'K': 4, 'distractor_strategy': 'sbert_profile', 'max_questions': None}, 'likelihood': {'model': 't5-large', 'beta': 5.0, 'batch_size': 16, 'max_length': 512}, 'ppo': {'total_timesteps': 100000, 'n_steps': 128, 'batch_size': 32, 'n_epochs': 4}, 'evaluation': {'compute_sq': True, 'run_choices_only': True, 'run_shuffle': True, 'bootstrap_ci_samples': 1000}}
+```
+
+```bash
+rg -n 'ARTIFACT_DIR / split|mc_path =|fallback|ppo_model|evaluation_report.json|plots/comparison.csv' scripts/{run_baselines.py,train_ppo.py,evaluate_all.py} | sort
+```
+
+```output
+scripts/evaluate_all.py:138:    out_dir = ARTIFACT_DIR / split
+scripts/evaluate_all.py:139:    mc_path = Path(args.mc_path) if args.mc_path else out_dir / "mc_dataset.json"
+scripts/evaluate_all.py:143:        fallback = PROJECT_ROOT / "data" / "processed" / "mc_dataset.json"
+scripts/evaluate_all.py:144:        if fallback.exists():
+scripts/evaluate_all.py:145:            print(f"MC dataset not found at {mc_path}, using fallback: {fallback}")
+scripts/evaluate_all.py:146:            mc_path = fallback
+scripts/evaluate_all.py:15:- evaluation_report.json (full eval + controls + baseline + PPO summaries)
+scripts/evaluate_all.py:18:- plots/comparison.csv
+scripts/evaluate_all.py:240:    save_json(out_dir / "evaluation_report.json", report)
+scripts/evaluate_all.py:313:    print(f"Wrote evaluation report to: {out_dir / 'evaluation_report.json'}")
+scripts/run_baselines.py:104:    out_dir = ARTIFACT_DIR / split
+scripts/run_baselines.py:107:    mc_path = Path(args.mc_path) if args.mc_path else out_dir / "mc_dataset.json"
+scripts/run_baselines.py:111:        fallback = PROJECT_ROOT / "data" / "processed" / "mc_dataset.json"
+scripts/run_baselines.py:112:        if fallback.exists():
+scripts/run_baselines.py:113:            print(f"MC dataset not found at {mc_path}, using fallback: {fallback}")
+scripts/run_baselines.py:114:            mc_path = fallback
+scripts/train_ppo.py:122:    model_path = out_dir / "ppo_model"
+scripts/train_ppo.py:82:    out_dir = ARTIFACT_DIR / split
+scripts/train_ppo.py:83:    mc_path = Path(args.mc_path) if args.mc_path else out_dir / "mc_dataset.json"
+scripts/train_ppo.py:87:        fallback = PROJECT_ROOT / "data" / "processed" / "mc_dataset.json"
+scripts/train_ppo.py:88:        if fallback.exists():
+scripts/train_ppo.py:89:            print(f"MC dataset not found at {mc_path}, using fallback: {fallback}")
+scripts/train_ppo.py:90:            mc_path = fallback
+```
+
+The artifact story in the code is straightforward once you see it spelled out:
+
+- `run_baselines.py`, `train_ppo.py`, and `evaluate_all.py` all compute `out_dir = ARTIFACT_DIR / split`
+- in full mode, `split` becomes `main`
+- each script looks for `artifacts/main/mc_dataset.json` first
+- if that file is absent, each script falls back to `data/processed/mc_dataset.json`
+
+That fallback keeps the full workflow usable even when the build step uses its legacy default output directory, but `--output-dir artifacts/main` is still the cleaner explicit choice for a long run you want to keep together.
+
+### T5 full run expectations
+
+The end-to-end T5 path is a second workflow, not an extension of the MLP smoke path. It performs two training phases:
+
+1. supervised warm-start on complete questions
+2. PPO fine-tuning with text observations
+
+This is the path that is most sensitive to hardware, available memory, model downloads, and patience. It is also where the checkpoint locations matter most, because the later comparison script expects concrete pretrained artifacts rather than rebuilding them implicitly.
+
+```bash
+venv/bin/python - <<'PY'
+import yaml
+from pathlib import Path
+cfg = yaml.safe_load(Path('configs/t5_policy.yaml').read_text())
+print({
+    'model_name': cfg['model']['model_name'],
+    'device': cfg['model']['device'],
+    'max_input_length': cfg['model']['max_input_length'],
+    'supervised_epochs': cfg['supervised']['epochs'],
+    'supervised_batch_size': cfg['supervised']['batch_size'],
+    'ppo_iterations': cfg['ppo']['iterations'],
+    'ppo_batch_size': cfg['ppo']['batch_size'],
+    'data_seed': cfg['data']['seed'],
+    'smoke_model_name': cfg['smoke']['model']['model_name'],
+})
+PY
+
+```
+
+```output
+{'model_name': 't5-large', 'device': 'auto', 'max_input_length': 512, 'supervised_epochs': 10, 'supervised_batch_size': 8, 'ppo_iterations': 100, 'ppo_batch_size': 8, 'data_seed': 42, 'smoke_model_name': 't5-small'}
+```
+
+```bash
+rg -n 'checkpoint_dir|best_model|history.json|results/t5_comparison.json|ppo_model.zip|ARTIFACT_DIR / "main" / "mc_dataset.json"' scripts/train_t5_policy.py scripts/compare_policies.py training/train_supervised_t5.py training/train_ppo_t5.py | sort
+```
+
+```output
+scripts/compare_policies.py:19:        --mlp-checkpoint checkpoints/ppo/best_model \\
+scripts/compare_policies.py:20:        --t5-checkpoint checkpoints/ppo_t5/best_model \\
+scripts/compare_policies.py:21:        --output results/t5_comparison.json
+scripts/compare_policies.py:25:        --mlp-checkpoint checkpoints/ppo/best_model \\
+scripts/compare_policies.py:26:        --t5-checkpoint checkpoints/ppo_t5/best_model \\
+scripts/compare_policies.py:31:        --t5-checkpoint checkpoints/ppo_t5/best_model \\
+scripts/compare_policies.py:377:        default="results/t5_comparison.json",
+scripts/compare_policies.py:405:            ARTIFACT_DIR / "main" / "mc_dataset.json",
+scripts/train_t5_policy.py:168:    flat["checkpoint_dir"] = sup.get("checkpoint_dir", "checkpoints")
+scripts/train_t5_policy.py:18:        --skip-supervised --model-path checkpoints/supervised/best_model
+scripts/train_t5_policy.py:209:            ARTIFACT_DIR / "main" / "mc_dataset.json",
+scripts/train_t5_policy.py:310:            trainer.checkpoint_dir / "best_model"
+scripts/train_t5_policy.py:333:    print(f"Best PPO model saved to: {trainer.checkpoint_dir / 'best_model'}")
+scripts/train_t5_policy.py:334:    print(f"Training history: {trainer.checkpoint_dir / 'history.json'}")
+training/train_ppo_t5.py:235:        - ``checkpoint_dir`` (str): Base checkpoint directory. Default "checkpoints".
+training/train_ppo_t5.py:248:    checkpoint_dir : Path
+training/train_ppo_t5.py:294:        self.checkpoint_dir = (
+training/train_ppo_t5.py:295:            Path(config.get("checkpoint_dir", "checkpoints")) / "ppo_t5"
+training/train_ppo_t5.py:297:        self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+training/train_ppo_t5.py:786:            If True, save to ``best_model/`` directory.
+training/train_ppo_t5.py:794:            save_path = self.checkpoint_dir / "best_model"
+training/train_ppo_t5.py:797:                self.checkpoint_dir
+training/train_ppo_t5.py:823:        history_path = self.checkpoint_dir / "history.json"
+training/train_ppo_t5.py:908:        best_model_path = trainer.checkpoint_dir / "best_model"
+training/train_ppo_t5.py:909:        if best_model_path.exists():
+training/train_ppo_t5.py:910:            print(f"Loading best model from {best_model_path}")
+training/train_ppo_t5.py:911:            model.load(str(best_model_path))
+training/train_ppo_t5.py:928:        results_path = trainer.checkpoint_dir / "test_results.json"
+training/train_supervised_t5.py:106:        - ``checkpoint_dir`` (str): Base checkpoint directory. Default "checkpoints".
+training/train_supervised_t5.py:10:is saved by validation accuracy to checkpoints/supervised/best_model/.
+training/train_supervised_t5.py:125:    checkpoint_dir : Path
+training/train_supervised_t5.py:167:        self.checkpoint_dir = Path(config.get("checkpoint_dir", "checkpoints")) / "supervised"
+training/train_supervised_t5.py:168:        self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+training/train_supervised_t5.py:336:        best model by validation accuracy to ``checkpoint_dir/best_model/``.
+training/train_supervised_t5.py:337:        Training history is saved to ``checkpoint_dir/history.json``.
+training/train_supervised_t5.py:406:        Best model is saved to ``checkpoint_dir/best_model/``, epoch
+training/train_supervised_t5.py:407:        checkpoints to ``checkpoint_dir/epoch_N/``.
+training/train_supervised_t5.py:412:            If True, save to ``best_model/`` directory.
+training/train_supervised_t5.py:420:            save_path = self.checkpoint_dir / "best_model"
+training/train_supervised_t5.py:422:            save_path = self.checkpoint_dir / f"epoch_{self.current_epoch + 1}"
+training/train_supervised_t5.py:458:        history_path = self.checkpoint_dir / "history.json"
+training/train_supervised_t5.py:529:        best_model_path = trainer.checkpoint_dir / "best_model"
+training/train_supervised_t5.py:530:        model.load(str(best_model_path))
+training/train_supervised_t5.py:543:        results_path = trainer.checkpoint_dir / "test_results.json"
+```
+
+A practical output map for the full run is:
+
+- `build_mc_dataset.py`
+  writes `mc_dataset.json`, train/val/test splits, and `answer_profiles.json`
+  default location: `data/processed/`
+  cleaner explicit location for a coordinated full run: `artifacts/main/`
+- `run_baselines.py`
+  writes baseline episode traces plus `baseline_summary.json` under `artifacts/main/`
+- `train_ppo.py`
+  writes `artifacts/main/ppo_model.zip`, `ppo_runs.json`, and `ppo_summary.json`
+- `evaluate_all.py`
+  writes `artifacts/main/evaluation_report.json` and `artifacts/main/plots/comparison.csv`
+- `train_t5_policy.py`
+  writes supervised checkpoints under `checkpoints/supervised/` and PPO checkpoints under `checkpoints/ppo_t5/`
+- `compare_policies.py`
+  writes `results/t5_comparison.json` by default
+
+Two caveats are worth carrying forward explicitly:
+
+- the example checkpoint path in `compare_policies.py` still points at the older `checkpoints/ppo/...` convention, while the current belief-feature PPO script actually emits `artifacts/main/ppo_model.zip`
+- a real full run is expected to download or load large models, use substantially more memory than smoke mode, and take long enough that it does not belong inside routine `showboat verify` or CI-like validation loops
+
