@@ -1,29 +1,43 @@
-This repository is a Python project for CS234 reinforcement learning experiments on quiz-bowl style question answering.
+# Copilot Instructions for `qanta-buzzer`
 
-## Project overview
+Use these instructions as the repo-wide baseline for Copilot work in this repository. Keep them concise, and prefer branch-local source-of-truth docs when they exist.
 
-- Core modules live in the repository root.
-- `config.py` defines the main configuration values and default paths.
-- `main.py` is the main entry point for supervised training, PPO training, full runs, and evaluation.
-- `environment.py`, `dataset.py`, `model.py`, `train_supervised.py`, `train_ppo.py`, and `metrics.py` contain the main training and evaluation logic.
+## Source of truth
 
-## Development guidance
+- If the checked-out branch contains `CLAUDE.md`, follow it.
+- If the checked-out branch contains `.planning/`, treat `.planning/` as the durable project state and keep important workflow decisions aligned with it.
+- Do not invent a second planning system in parallel with existing repo docs.
 
-- Keep changes minimal and focused on the requested task.
-- Prefer updating the existing root-level Python modules instead of introducing new abstractions unless they are clearly necessary.
-- Follow the existing style in each file. This repository uses simple module-level scripts and straightforward class-based organization.
-- Do not add new dependencies unless they are required for the task.
+## Code paths
+
+- This repository has an older root-level prototype path centered on files such as `main.py`, `environment.py`, `dataset.py`, `model.py`, `train_supervised.py`, `train_ppo.py`, and `metrics.py`.
+- Some branches also contain a newer modular pipeline with packages such as `qb_data/`, `qb_env/`, `models/`, `agents/`, `evaluation/`, `scripts/`, and `training/`.
+- Match the checked-out branch. Do not assume the modular pipeline exists on every branch, and do not force work back into the root-level prototype if the modular packages are already present.
+
+## Change discipline
+
+- Keep changes minimal and scoped to the request.
+- Prefer editing existing modules over introducing new abstractions unless the request clearly needs them.
+- Do not add dependencies unless they are required.
+- Do not commit generated Python cache files, virtual environments, model artifacts, or local notebooks unless the task explicitly asks for tracked generated outputs.
 
 ## Validation
 
-- Install dependencies with `pip install -r requirements.txt`.
-- Existing validation scripts are:
+- Prefer the narrowest relevant verification for the files you changed.
+- On older/root-prototype branches, the lightweight validation scripts are:
   - `python test_imports.py`
   - `python test_csv_loader.py`
-- `python main.py --help` shows the supported CLI options for the main training entry point.
+- On branches with `tests/` and `pyproject.toml`, prefer targeted `pytest` first and run the full suite when the change is broad or touches shared infrastructure.
+- If the branch exposes smoke workflows such as `python scripts/build_mc_dataset.py --smoke`, prefer those over heavyweight full training runs during routine iteration.
 
-## Repository-specific notes
+## Heavyweight ML workflows
 
-- `requirements.txt` includes heavyweight ML dependencies such as PyTorch and Transformers.
-- The first model run may download `t5-large`, so avoid unnecessary execution-heavy changes when working on documentation or configuration tasks.
-- There is no existing CI or dedicated lint configuration in the repository, so reuse the current scripts and commands instead of introducing new tooling.
+- This repo uses heavyweight ML dependencies including PyTorch, Transformers, sentence-transformers, and Stable-Baselines3.
+- Avoid expensive model downloads or long training runs unless the task actually requires them.
+- If you are editing docs, config handling, tests, or small control-flow logic, do not trigger full T5 or PPO training just to prove the change.
+
+## Practical repo guidance
+
+- Respect the existing file organization and naming conventions on the active branch.
+- When documentation and code disagree, trust the executable code first, then update docs to match.
+- If a branch includes compatibility shims or bridge code, preserve backward-compatible imports and config aliases unless the task explicitly asks to remove them.
