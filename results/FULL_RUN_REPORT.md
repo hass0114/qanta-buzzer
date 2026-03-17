@@ -512,7 +512,7 @@ total 96
 
 ## Post-run validation
 
-- `pytest tests/ -q --tb=short` -> `342 passed, 3 skipped`
+- `pytest tests/ -q --tb=short` -> `342 passed, 3 skipped` (at initial run commit; current HEAD has 360+ tests)
 - Targeted tests after the two live fixes -> `44 passed, 1 skipped`
 - Remaining-phase summary snippet run after completion and new artifacts verified in `results/`
 - No mixed likelihood regime was used in the executed comparisons:
