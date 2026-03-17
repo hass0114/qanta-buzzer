@@ -230,12 +230,22 @@ def main() -> None:
     print("Running shuffle control...")
     shuffle_eval = run_shuffle_control_precomputed(precomputed, threshold, alpha)
 
-    print("Running alias substitution control...")
-    alias_eval = run_alias_substitution_control(
-        mc_questions,
-        alias_lookup=alias_lookup,
-        evaluator=lambda qset: evaluate_questions_live(qset),
-    )
+    if alias_lookup:
+        print("Running alias substitution control...")
+        alias_eval = run_alias_substitution_control(
+            mc_questions,
+            alias_lookup=alias_lookup,
+            evaluator=lambda qset: evaluate_questions_live(qset),
+        )
+        alias_control_report = {k: v for k, v in alias_eval.items() if k != "runs"}
+    else:
+        print(
+            "Skipping alias substitution control: alias_lookup.json missing or empty"
+        )
+        alias_control_report = {
+            "skipped": True,
+            "reason": "alias_lookup.json missing or empty",
+        }
 
     print("Running choices-only control...")
     choices_only = run_choices_only_control(mc_questions)
@@ -255,9 +265,7 @@ def main() -> None:
         "controls": {
             "choices_only": choices_only,
             "shuffle": {k: v for k, v in shuffle_eval.items() if k != "runs"},
-            "alias_substitution": {
-                k: v for k, v in alias_eval.items() if k != "runs"
-            },
+            "alias_substitution": alias_control_report,
         },
         "per_category": per_category_sorted,
         "baseline_summary": baseline_summary,
@@ -313,16 +321,9 @@ def main() -> None:
         out_dir / "plots" / "entropy_vs_clue.png",
     )
 
-    # Calibration curve — use top_p (belief in top answer) as confidence
-    confidences = []
-    outcomes = []
-    for row in full_eval["runs"]:
-        top_p = row.get("top_p_trace", row.get("c_trace", []))
-        if not top_p:
-            continue
-        idx = min(int(row["buzz_step"]), len(top_p) - 1)
-        confidences.append(float(top_p[idx]))
-        outcomes.append(1 if bool(row["correct"]) else 0)
+    # Calibration curve — use canonical helper for consistency
+    from evaluation.metrics import calibration_pairs_at_buzz
+    confidences, outcomes = calibration_pairs_at_buzz(full_eval["runs"])
     plot_calibration_curve(
         confidences, outcomes, out_dir / "plots" / "calibration.png"
     )
@@ -355,10 +356,11 @@ def main() -> None:
         "agent": "shuffle_control",
         **{k: v for k, v in shuffle_eval.items() if k != "runs"},
     })
-    table_rows.append({
-        "agent": "alias_control",
-        **{k: v for k, v in alias_eval.items() if k != "runs"},
-    })
+    if not alias_control_report.get("skipped"):
+        table_rows.append({
+            "agent": "alias_control",
+            **{k: v for k, v in alias_control_report.items() if k != "runs"},
+        })
 
     # Add PPO if available
     if ppo_summary:
